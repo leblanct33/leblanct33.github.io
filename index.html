@@ -50,7 +50,7 @@
           <aside class="callout" aria-label="Answer">
             <p class="callout__head"><span class="hark-mark" data-size="16"></span> Answer</p>
             <p class="callout__lead">
-              <strong>Yes.</strong> Edmonton regular gas averaged 3.7¢/L cheaper than Calgary (95% CI 3.2 to 4.2¢), and was cheaper in 90 of 94 months.
+              <strong>Yes, when the route already passes through Edmonton.</strong> Historically, Edmonton regular gas averaged 3.7¢/L cheaper than Calgary (95% CI 2.7 to 4.7¢, adjusted for month-to-month correlation), and was cheaper in 90 of 94 months (historical frequency, not a guarantee).
             </p>
             <a class="btn" href="#recommend">Recommendations</a>
           </aside>
@@ -61,8 +61,8 @@
         <section class="stats">
           <div class="stat"><span class="stat__fig">3.7¢/L</span><span class="stat__label">Average gap, Calgary minus Edmonton</span></div>
           <div class="stat"><span class="stat__fig">90 of 94</span><span class="stat__label">Months Edmonton was cheaper</span></div>
-          <div class="stat"><span class="stat__fig">t = 15.5</span><span class="stat__label">Paired t-test, df = 93, p &lt; 0.0001</span></div>
-          <div class="stat"><span class="stat__fig">~$1,119</span><span class="stat__label">Saved per year, 10-van fleet</span></div>
+          <div class="stat"><span class="stat__fig">p &lt; 0.0001</span><span class="stat__label">Paired t-test, still significant after autocorrelation adjustment</span></div>
+          <div class="stat"><span class="stat__fig">~$1,100</span><span class="stat__label">Potential gross saving per year, 10-van fleet, if all fuel shifts to Edmonton</span></div>
         </section>
 
         <section class="section" id="requirements" data-nav="Requirements">
@@ -83,11 +83,13 @@
                 <li>Test whether it is statistically real</li>
                 <li>Check seasonality</li>
                 <li>Give a dollar recommendation</li>
+                <li>Worthwhile only if net saving (after fuel, driver time and admin) is positive; never via detours</li>
               </ul>
             </div>
             <div>
               <h3>Scope</h3>
               <p>Monthly regular unleaded, self-service, January 2019 to October 2026.</p>
+              <p>Regular gasoline vehicles only (not diesel).</p>
             </div>
             <div>
               <h3>Deliverables</h3>
@@ -183,7 +185,7 @@
           </figure>
 
           <figure class="chart">
-            <figcaption class="chart__cap">Chart B. The gap is positive every year, widest in 2020 (fall 2020 gaps hit 12–13¢).<small>Average yearly gap, Calgary minus Edmonton, cents per litre; 2026 is Jan to Oct · Source: Statistics Canada, Table 18-10-0001-01</small></figcaption>
+            <figcaption class="chart__cap">Chart B. The gap is positive every year, widest in 2020 (fall 2020 gaps hit 12–13¢).<small>Average yearly gap, Calgary minus Edmonton, cents per litre; 2026 YTD (Jan–Oct) is a partial year · Source: Statistics Canada, Table 18-10-0001-01</small></figcaption>
             <div class="chart__canvas"><canvas id="chartB" role="img" aria-label="Yearly gap ranges from 2.40 cents in 2023 to 5.45 cents in 2020, positive every year"></canvas></div>
           </figure>
           <div class="table-wrap">
@@ -200,7 +202,7 @@
                 <tr><th scope="row">2023</th><td>134.3</td><td>136.7</td><td class="num">2.40</td></tr>
                 <tr><th scope="row">2024</th><td>142.3</td><td>146.9</td><td class="num">4.63</td></tr>
                 <tr><th scope="row">2025</th><td>130.4</td><td>133.4</td><td class="num">3.05</td></tr>
-                <tr><th scope="row">2026 <small>Jan–Oct</small></th><td>151.8</td><td>155.7</td><td class="num">3.89</td></tr>
+                <tr><th scope="row">2026 YTD (Jan–Oct)</th><td>151.8</td><td>155.7</td><td class="num">3.89</td></tr>
               </tbody>
             </table>
           </div>
@@ -211,12 +213,12 @@
           </figure>
 
           <figure class="chart">
-            <figcaption class="chart__cap">Chart D. Prices peak in summer (July ~20¢ above December) in both cities.<small>Average price by calendar month, 2019–2026, cents per litre · Source: Statistics Canada, Table 18-10-0001-01</small></figcaption>
+            <figcaption class="chart__cap">Chart D. Prices peak in summer: July averaged about 16¢ above December (complete years 2019–2025: July 132.9, Dec 116.9 ¢/L). Edmonton was cheaper on average in each of the 12 calendar months (average gap 3.1–4.4¢), though not in every individual month. Y-axis starts at 100¢/L.<small>Average price by calendar month, cents per litre; complete years 2019–2025 · Source: Statistics Canada, Table 18-10-0001-01</small></figcaption>
             <div class="chart__canvas"><canvas id="chartD" role="img" aria-label="Both cities are lowest in December and January, near 117 and 120 cents, and highest in July, 136.6 and 140.4 cents"></canvas></div>
           </figure>
 
           <figure class="chart">
-            <figcaption class="chart__cap">Chart E. Near-perfect linear relationship: same market forces, roughly constant 4¢ offset.<small>Each dot is one month; fitted line Calgary = 3.96 + 0.998 × Edmonton, r = 0.995, R² = 0.991; cents per litre · Source: Statistics Canada, Table 18-10-0001-01</small></figcaption>
+            <figcaption class="chart__cap">Chart E. Each dot is one month; fitted line Calgary = 3.96 + 0.998 × Edmonton, r = 0.995, R² = 0.991; slope 95% CI 0.978 to 1.018. The prices are strongly associated; shared market forces are a plausible explanation, not proven by correlation.<small>Cents per litre · Source: Statistics Canada, Table 18-10-0001-01</small></figcaption>
             <div class="chart__canvas chart__canvas--tall"><canvas id="chartE" role="img" aria-label="94 monthly points lie almost on a straight line, Calgary equals 3.96 plus 0.998 times Edmonton, R squared 0.991"></canvas></div>
           </figure>
         </section>
@@ -242,6 +244,7 @@
                 <h3>95% confidence interval</h3>
                 <p class="x-formula">d̄ ± t(0.025, 93) × SE<br />= 3.73 ± 1.986 × 0.241<br />= (3.25, 4.20) ¢/L</p>
                 <p>We are 95% confident the true average gap is between 3.25 and 4.20 cents per litre.</p>
+                <p>Autocorrelation-adjusted: 2.71 to 4.74 ¢/L (see Check).</p>
               </div>
             </article>
             <article class="step">
@@ -249,31 +252,42 @@
               <div>
                 <h3>Paired t-test</h3>
                 <p class="x-formula">H0: μd = 0 · H1: μd &gt; 0</p>
+                <p class="x-formula">α = 0.05; reject H0 if p &lt; 0.05.</p>
                 <p class="x-formula">t = d̄ / SE = 3.73 / 0.241 = 15.47 · df = 93 · p &lt; 0.0001</p>
                 <p>Reject H0: Calgary is significantly more expensive than Edmonton.</p>
               </div>
               <dl class="step__panel"><dt>Decision</dt><dd><span class="chip chip--solid">Reject H0</span></dd></dl>
             </article>
             <article class="step">
-              <div class="step__intro"><p class="step__num">04</p><p class="step__eyebrow">Proportion</p></div>
+              <div class="step__intro"><p class="step__num">04</p><p class="step__eyebrow">Check</p></div>
+              <div>
+                <h3>Check: are months independent?</h3>
+                <p>Monthly gaps are autocorrelated (lag-1 r = 0.61), so the 94 months carry about as much information as 23 independent ones.</p>
+                <p class="x-formula">Adjusted: effective n ≈ 22.9 · SE = 0.488 · t ≈ 7.63 · 95% CI (2.71, 4.74) ¢/L · p &lt; 0.0001</p>
+                <p>Conclusion unchanged: reject H0.</p>
+              </div>
+              <dl class="step__panel"><dt>Decision</dt><dd><span class="chip chip--solid">Reject H0</span></dd></dl>
+            </article>
+            <article class="step">
+              <div class="step__intro"><p class="step__num">05</p><p class="step__eyebrow">Proportion</p></div>
               <div>
                 <h3>How often Edmonton wins</h3>
                 <p class="x-formula">p̂ = 90 / 94 = 95.7% of months</p>
               </div>
             </article>
             <article class="step">
-              <div class="step__intro"><p class="step__num">05</p><p class="step__eyebrow">Relationship</p></div>
+              <div class="step__intro"><p class="step__num">06</p><p class="step__eyebrow">Relationship</p></div>
               <div>
                 <h3>Correlation and regression</h3>
                 <p class="x-formula">Calgary = 3.96 + 0.998 × Edmonton · r = 0.995 · R² = 0.991</p>
-                <p>A slope of about 1 means the gap does not grow when prices rise (Chart E).</p>
+                <p>The slope CI (0.978–1.018) includes 1, consistent with a gap that does not grow as prices rise (Chart E).</p>
               </div>
             </article>
             <article class="step">
-              <div class="step__intro"><p class="step__num">06</p><p class="step__eyebrow">Interpretation</p></div>
+              <div class="step__intro"><p class="step__num">07</p><p class="step__eyebrow">Interpretation</p></div>
               <div>
                 <h3>Small, but very consistent</h3>
-                <p>The city gap is small but very consistent. Seasonality is much larger (~20¢), but a business can't easily shift when it drives.</p>
+                <p>The city gap is small but very consistent. Seasonality is much larger (about 16¢, July vs December, 2019–2025), but a business can't easily shift when it drives.</p>
               </div>
             </article>
           </div>
@@ -287,15 +301,16 @@
           <div class="cards">
             <div>
               <h3>Refuel in Edmonton</h3>
-              <p>Before Calgary runs, whenever practical. Saves ~3.7¢/L (CI 3.2–4.2¢).</p>
+              <p>Before Calgary runs, when the route already passes through. Historically ~3.7¢/L cheaper (adjusted CI 2.7–4.7¢); check current prices.</p>
             </div>
             <div>
               <h3>Budget seasonally</h3>
-              <p>Expect summer fuel costs ~15–20¢/L higher than December–January. Budget fuel by season, not as a flat monthly amount.</p>
+              <p>Use historical averages (summer about 15¢/L above December–January) as a starting budget assumption, not a guarantee.</p>
             </div>
             <div>
               <h3>Don't detour to save</h3>
               <p>The gap is small, so fill in Edmonton only when it is already on the route.</p>
+              <p>A 10 km detour burns ~1.2 L (~$1.56 at $1.30/L), about what a 40 L fill saves, before driver time.</p>
             </div>
           </div>
           <div class="pair">
@@ -306,14 +321,14 @@
                 <div class="row"><dt>Consumption</dt><dd>12 L/100 km</dd></div>
                 <div class="row"><dt>Fuel used <small>Per year</small></dt><dd>30,000 L</dd></div>
                 <div class="row"><dt>Gap</dt><dd>$0.0373/L</dd></div>
-                <div class="row row--total"><dt>Saved per year</dt><dd>~$1,119</dd></div>
+                <div class="row row--total"><dt>Saved per year</dt><dd>~$1,100 (full shift)</dd></div>
               </dl>
               <p class="fineprint">Assumed fleet numbers; savings scale linearly with fuel volume.</p>
             </div>
             <aside class="callout" aria-label="Dollar impact">
               <p class="callout__head">Dollar impact</p>
-              <p class="callout__lead"><strong>Small per fill, real at fleet scale.</strong> 30,000 L × $0.0373 ≈ $1,119 a year for ten vans.</p>
-              <p class="fineprint">Using the CI ends (3.25–4.20¢) gives roughly $975 to $1,260 a year.</p>
+              <p class="callout__lead"><strong>Potential gross saving if all 30,000 L shift to Edmonton:</strong> 30,000 L × $0.0373 ≈ $1,100 a year.</p>
+              <p class="fineprint">At 25%, 50% or 75% of volume shifted: about $280, $560 or $840. Using the adjusted CI (2.7–4.7¢): about $810 to $1,420 at full shift. This is not a forecast.</p>
             </aside>
           </div>
         </section>
@@ -328,6 +343,8 @@
             <div><h3>Discounts</h3><p>Fleet card discounts and individual station pricing can beat the average gap.</p></div>
             <div><h3>Policy changes</h3><p>The past gap may change with taxes or market events, e.g. the 2022 provincial fuel tax relief and the 2025 removal of the consumer carbon price, which affected both cities.</p></div>
             <div><h3>Assumed fleet</h3><p>The dollar estimate uses assumed fleet numbers.</p></div>
+            <div><h3>Regular gas only</h3><p>Results do not apply to diesel or other fuels.</p></div>
+            <div><h3>Recent trend</h3><p>The last 12 months averaged a 3.8¢ gap and the last 24 months 3.5¢, close to the full-period 3.7¢, with Edmonton cheaper in all 24.</p></div>
           </div>
         </section>
 
@@ -353,10 +370,10 @@
 
           <div class="head">
             <h2>Independent review</h2>
-            <p class="head__sub"><span class="chip">In progress</span></p>
+            <p class="head__sub"><span class="chip">Complete · Nov 24, 2026</span></p>
           </div>
           <div class="prose">
-            <p>A different AI (ChatGPT) is reviewing the requirements, data, charts, calculations, interpretations and recommendations. Its findings and our corrections will be listed here.</p>
+            <p>Complete (Nov 24, 2026), reviewer ChatGPT. Verdict: provisionally satisfactory, corrections recommended; all corrections applied.</p>
           </div>
 
           <div class="table-wrap">
@@ -364,7 +381,16 @@
               <caption>Corrections record</caption>
               <thead><tr><th scope="col">Issue</th><th scope="col">Fix</th><th scope="col">Verified by</th></tr></thead>
               <tbody>
-                <tr><th scope="row">Pending review</th><td class="muted">—</td><td class="muted">—</td></tr>
+                <tr><th scope="row">Autocorrelated months understate SE <small>High</small></th><td>Added lag-1 check and adjusted CI 2.71–4.74</td><td>Group</td></tr>
+                <tr><th scope="row">Savings assume full volume shift <small>High</small></th><td>Relabelled as potential gross saving; added 25/50/75% scenarios</td><td>Group</td></tr>
+                <tr><th scope="row">“Gap holds every month” ambiguous <small>High</small></th><td>Reworded to “cheaper on average in each calendar month”</td><td>Group</td></tr>
+                <tr><th scope="row">No financial success threshold <small>Med</small></th><td>Added net-saving criterion</td><td>Group</td></tr>
+                <tr><th scope="row">Slope ≈ 1 overstated; correlation ≠ causation <small>Med</small></th><td>Added slope CI; association wording</td><td>Group</td></tr>
+                <tr><th scope="row">α not stated <small>Med</small></th><td>Added α = 0.05 rule</td><td>Group</td></tr>
+                <tr><th scope="row">Seasonal months unequal; seasonal certainty <small>Med</small></th><td>Used complete years; budget as assumption</td><td>Group</td></tr>
+                <tr><th scope="row">Historical frequency; fuel scope; structural change <small>Med</small></th><td>Labelled historical; regular gas only; recent 12/24-month check</td><td>Group</td></tr>
+                <tr><th scope="row">2026 partial year; savings rounding <small>Low</small></th><td>Labelled YTD; rounded to ~$1,100</td><td>Group</td></tr>
+                <tr><th scope="row">Raw data unverified <small>Med</small></th><td>CSV published for download; matches StatCan</td><td>Group</td></tr>
               </tbody>
             </table>
           </div>
@@ -487,10 +513,7 @@ month,edmonton,calgary
 2026-10,155.5,157.9
     </script>
     <script type="application/json" id="yearly">
-      [{"year":"2019","gap":2.93},{"year":"2020","gap":5.45},{"year":"2021","gap":3.81},{"year":"2022","gap":3.67},{"year":"2023","gap":2.40},{"year":"2024","gap":4.63},{"year":"2025","gap":3.05},{"year":"2026 (Jan–Oct)","gap":3.89}]
-    </script>
-    <script type="application/json" id="seasonal">
-      [{"m":"Jan","e":117.0,"c":120.4},{"m":"Feb","e":120.7,"c":123.7},{"m":"Mar","e":128.8,"c":132.1},{"m":"Apr","e":129.4,"c":133.4},{"m":"May","e":134.9,"c":139.1},{"m":"Jun","e":134.3,"c":138.7},{"m":"Jul","e":136.6,"c":140.4},{"m":"Aug","e":132.0,"c":135.7},{"m":"Sep","e":129.6,"c":133.7},{"m":"Oct","e":131.4,"c":134.9},{"m":"Nov","e":123.3,"c":127.4},{"m":"Dec","e":116.9,"c":120.0}]
+      [{"year":"2019","gap":2.93},{"year":"2020","gap":5.45},{"year":"2021","gap":3.81},{"year":"2022","gap":3.67},{"year":"2023","gap":2.40},{"year":"2024","gap":4.63},{"year":"2025","gap":3.05},{"year":"2026 YTD (Jan–Oct)","gap":3.89}]
     </script>
     <script src="hark.js"></script>
     <script src="chart.js"></script>
@@ -569,7 +592,11 @@ month,edmonton,calgary
         });
 
         // Chart D: seasonality
-        var s = Hark.data("seasonal");
+        var s = MON.map(function (m, i) {
+          var ms = rows.filter(function (r) { var y = +String(r.month).slice(0, 4); return y >= 2019 && y <= 2025 && +String(r.month).slice(5, 7) === i + 1; });
+          var avg = function (k) { return Math.round(ms.reduce(function (a, r) { return a + r[k]; }, 0) / ms.length * 10) / 10; };
+          return { m: m, e: avg("edmonton"), c: avg("calgary") };
+        });
         new Chart(document.getElementById("chartD"), {
           type: "line",
           data: {
@@ -581,7 +608,7 @@ month,edmonton,calgary
           },
           options: {
             interaction: { mode: "index", intersect: false },
-            scales: { x: { title: axis("Calendar month (average of 2019–2026)") }, y: { title: axis(CPL), ticks: { callback: cpl } } },
+            scales: { x: { title: axis("Calendar month (average of complete years 2019–2025)") }, y: { min: 100, title: axis(CPL), ticks: { callback: cpl } } },
             plugins: { tooltip: { callbacks: { label: function (ctx) { return ctx.dataset.label + ": " + ctx.raw.toFixed(1) + "¢/L"; } } } }
           }
         });
