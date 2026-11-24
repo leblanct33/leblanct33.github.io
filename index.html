@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MGTS-103 Project: Gas Prices, Edmonton vs Calgary</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400&display=swap"
+    />
+    <link rel="stylesheet" href="hark.css" />
+    <link rel="stylesheet" href="hark-hero.css" />
+    <link rel="stylesheet" href="hark-charts.css" />
+    <style>
+      .x-formula {
+        margin: 10px 0;
+        padding: 10px 14px;
+        background: var(--fill-tertiary);
+        border-radius: var(--r-s);
+        font-family: "Geist Mono", ui-monospace, monospace;
+        font-size: var(--size-small);
+        font-weight: var(--weight-regular);
+        color: var(--text-primary);
+        white-space: normal;
+        overflow-wrap: anywhere;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+      }
+      @media (max-width: 600px) {
+        .x-formula { font-size: var(--size-caption); padding: 8px 10px; }
+      }
+      .x-steps-list { margin: 0; padding-left: 1.4em; font: var(--type-body); max-width: 68ch; }
+      .x-steps-list li { margin: 6px 0; }
+    </style>
+  </head>
+  <body>
+    <div class="page" id="top">
+      <header class="nav glass" data-auto></header>
+      <main class="main">
+        <section class="hero">
+          <div class="hero__copy">
+            <p class="hero__eyebrow">MGTS-103 · AI Assisted Data Visualization Analysis and Recommendations</p>
+            <h1>Fill Up in Edmonton?</h1>
+            <p class="hero__sub">Gas prices, Edmonton vs Calgary, 2019–2026: should a fleet refuel in Edmonton?</p>
+            <p class="hero__meta">MacEwan University · Intro to Business Statistics · 94 months of StatCan data</p>
+          </div>
+          <aside class="callout" aria-label="Answer">
+            <p class="callout__head"><span class="hark-mark" data-size="16"></span> Answer</p>
+            <p class="callout__lead">
+              <strong>Yes.</strong> Edmonton regular gas averaged 3.7¢/L cheaper than Calgary (95% CI 3.2 to 4.2¢), and was cheaper in 90 of 94 months.
+            </p>
+            <a class="btn" href="#recommend">Recommendations</a>
+          </aside>
+        </section>
+
+        <p class="fineprint">MGTS-103-SB07, MacEwan University, Fall 2026 (instructor Jun Ma). Group: Tyson LeBlanc and Zyler. Built with AI assistance; see the <a class="link" href="#ai">AI use and independent review</a> section.</p>
+
+        <section class="stats">
+          <div class="stat"><span class="stat__fig">3.7¢/L</span><span class="stat__label">Average gap, Calgary minus Edmonton</span></div>
+          <div class="stat"><span class="stat__fig">90 of 94</span><span class="stat__label">Months Edmonton was cheaper</span></div>
+          <div class="stat"><span class="stat__fig">t = 15.5</span><span class="stat__label">Paired t-test, df = 93, p &lt; 0.0001</span></div>
+          <div class="stat"><span class="stat__fig">~$1,119</span><span class="stat__label">Saved per year, 10-van fleet</span></div>
+        </section>
+
+        <section class="section" id="requirements" data-nav="Requirements">
+          <div class="head">
+            <p class="head__eyebrow">1 · Requirements (AI-drafted, group-confirmed)</p>
+            <h2>One question, for one decision-maker.</h2>
+            <p class="head__sub">Should an Alberta business running vehicles between Edmonton and Calgary (a courier or trades company) do its refuelling in Edmonton?</p>
+          </div>
+          <div class="cards">
+            <div>
+              <h3>Decision-maker</h3>
+              <p>Fleet / operations manager.</p>
+            </div>
+            <div>
+              <h3>Success criteria</h3>
+              <ul>
+                <li>Quantify the price gap</li>
+                <li>Test whether it is statistically real</li>
+                <li>Check seasonality</li>
+                <li>Give a dollar recommendation</li>
+              </ul>
+            </div>
+            <div>
+              <h3>Scope</h3>
+              <p>Monthly regular unleaded, self-service, January 2019 to October 2026.</p>
+            </div>
+            <div>
+              <h3>Deliverables</h3>
+              <ul>
+                <li>This published report</li>
+                <li>Dataset and data dictionary</li>
+                <li>AI review report and corrections log</li>
+                <li>Slides</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="data" data-nav="Data">
+          <div class="head">
+            <p class="head__eyebrow">2 · Data</p>
+            <h2>94 months of official city averages, with nothing missing.</h2>
+          </div>
+          <div class="prose">
+            <p>
+              Source: Statistics Canada, Table 18-10-0001-01, <a class="link" href="https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810000101" target="_blank" rel="noopener">“Monthly average retail prices for gasoline and fuel oil, by geography”</a>.
+              Period January 2019 to October 2026 (the latest month released). Sample size n = 94 monthly observations per city (188 values).
+            </p>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <caption>Data dictionary</caption>
+              <thead>
+                <tr><th scope="col">Variable</th><th scope="col">Meaning</th><th scope="col">Unit</th></tr>
+              </thead>
+              <tbody>
+                <tr><th scope="row">month</th><td>Monthly reference period</td><td class="muted">YYYY-MM</td></tr>
+                <tr><th scope="row">edmonton_cents_per_L</th><td>Average retail price, regular unleaded self-serve, Edmonton</td><td class="muted">cents per litre</td></tr>
+                <tr><th scope="row">calgary_cents_per_L</th><td>Average retail price, regular unleaded self-serve, Calgary</td><td class="muted">cents per litre</td></tr>
+                <tr><th scope="row">difference_cal_minus_edm <small>Calculated</small></th><td>Calgary minus Edmonton</td><td class="muted">cents per litre</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="fineprint">Data download: <a class="link" href="edm_cal_gas_2019_2026.csv" download>Dataset: edm_cal_gas_2019_2026.csv (94 months, cents/L)</a></p>
+          <div class="head"><h2>Preparation steps</h2></div>
+          <ol class="x-steps-list">
+            <li>Downloaded the full table CSV from StatCan.</li>
+            <li>Filtered fuel type “Regular unleaded gasoline at self service filling stations” and GEO = Edmonton and Calgary.</li>
+            <li>Filtered 2019-01 onward.</li>
+            <li>Pivoted to one row per month.</li>
+            <li>Checked for missing values (none), duplicates (none) and status flags (none).</li>
+            <li>Calculated the difference column.</li>
+          </ol>
+        </section>
+
+        <section class="section" id="describe" data-nav="Statistics">
+          <div class="head">
+            <p class="head__eyebrow">3 · Descriptive statistics</p>
+            <h2>Prices swing by over 120¢; the gap barely moves.</h2>
+            <p class="head__sub">Both cities have an SD near 24¢; the difference has an SD of 2.34¢.</p>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <caption>Cents per litre, n = 94 months</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Series</th><th scope="col">Mean</th><th scope="col">Median</th><th scope="col">SD</th>
+                  <th scope="col">Min</th><th scope="col">Q1</th><th scope="col">Q3</th><th scope="col">Max</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">Edmonton</th><td class="num">128.08</td><td>129.7</td><td>24.35</td>
+                  <td>62.4 <small>Apr 2020</small></td><td>110.2</td><td>142.5</td><td>186.0 <small>Jun 2022</small></td>
+                </tr>
+                <tr>
+                  <th scope="row">Calgary</th><td class="num">131.80</td><td>132.55</td><td>24.42</td>
+                  <td>66.2 <small>Apr 2020</small></td><td>113.6</td><td>147.0</td><td>189.5 <small>Jun 2022</small></td>
+                </tr>
+                <tr class="is-highlight">
+                  <th scope="row">Difference <small>Cal − Edm</small></th><td class="num">3.73</td><td>3.6</td><td>2.34</td>
+                  <td>−2.8</td><td>2.6</td><td>4.7</td><td>13.5</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="charts" data-nav="Charts">
+          <div class="head">
+            <p class="head__eyebrow">4–8 · Visualizations</p>
+            <h2>Same market, same shape, a steady offset.</h2>
+          </div>
+
+          <figure class="chart">
+            <figcaption class="chart__cap">Chart A. Both cities move together; Calgary sits slightly above almost every month. Low point April 2020 (pandemic), peak June 2022.<small>Monthly average, regular unleaded self-serve, cents per litre, Jan 2019 to Oct 2026 · Source: Statistics Canada, Table 18-10-0001-01</small></figcaption>
+            <div class="chart__canvas chart__canvas--tall"><canvas id="chartA" role="img" aria-label="Edmonton and Calgary prices track each other from 2019 to 2026, low of 62.4 and 66.2 cents in April 2020, peak of 186.0 and 189.5 cents in June 2022, Calgary above almost every month"></canvas></div>
+          </figure>
+
+          <figure class="chart">
+            <figcaption class="chart__cap">Chart B. The gap is positive every year, widest in 2020 (fall 2020 gaps hit 12–13¢).<small>Average yearly gap, Calgary minus Edmonton, cents per litre; 2026 is Jan to Oct · Source: Statistics Canada, Table 18-10-0001-01</small></figcaption>
+            <div class="chart__canvas"><canvas id="chartB" role="img" aria-label="Yearly gap ranges from 2.40 cents in 2023 to 5.45 cents in 2020, positive every year"></canvas></div>
+          </figure>
+          <div class="table-wrap">
+            <table>
+              <caption>Yearly average price, cents per litre</caption>
+              <thead>
+                <tr><th scope="col">Year</th><th scope="col">Edmonton</th><th scope="col">Calgary</th><th scope="col">Gap</th></tr>
+              </thead>
+              <tbody>
+                <tr><th scope="row">2019</th><td>102.7</td><td>105.6</td><td class="num">2.93</td></tr>
+                <tr class="is-highlight"><th scope="row">2020 <small>Widest gap</small></th><td>89.4</td><td>94.8</td><td class="num">5.45</td></tr>
+                <tr><th scope="row">2021</th><td>124.4</td><td>128.2</td><td class="num">3.81</td></tr>
+                <tr><th scope="row">2022</th><td>153.2</td><td>156.9</td><td class="num">3.67</td></tr>
+                <tr><th scope="row">2023</th><td>134.3</td><td>136.7</td><td class="num">2.40</td></tr>
+                <tr><th scope="row">2024</th><td>142.3</td><td>146.9</td><td class="num">4.63</td></tr>
+                <tr><th scope="row">2025</th><td>130.4</td><td>133.4</td><td class="num">3.05</td></tr>
+                <tr><th scope="row">2026 <small>Jan–Oct</small></th><td>151.8</td><td>155.7</td><td class="num">3.89</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <figure class="chart">
+            <figcaption class="chart__cap">Chart C. Most months the gap is 2–5¢; only 4 months had Calgary cheaper (Dec 2022, Oct–Dec 2023).<small>Histogram of the 94 monthly differences, Calgary minus Edmonton, 2¢ bins, cents per litre · Source: Statistics Canada, Table 18-10-0001-01</small></figcaption>
+            <div class="chart__canvas"><canvas id="chartC" role="img" aria-label="48 months fall in the 2 to 4 cent bin and 28 in the 4 to 6 cent bin; 4 months are below zero"></canvas></div>
+          </figure>
+
+          <figure class="chart">
+            <figcaption class="chart__cap">Chart D. Prices peak in summer (July ~20¢ above December) in both cities.<small>Average price by calendar month, 2019–2026, cents per litre · Source: Statistics Canada, Table 18-10-0001-01</small></figcaption>
+            <div class="chart__canvas"><canvas id="chartD" role="img" aria-label="Both cities are lowest in December and January, near 117 and 120 cents, and highest in July, 136.6 and 140.4 cents"></canvas></div>
+          </figure>
+
+          <figure class="chart">
+            <figcaption class="chart__cap">Chart E. Near-perfect linear relationship: same market forces, roughly constant 4¢ offset.<small>Each dot is one month; fitted line Calgary = 3.96 + 0.998 × Edmonton, r = 0.995, R² = 0.991; cents per litre · Source: Statistics Canada, Table 18-10-0001-01</small></figcaption>
+            <div class="chart__canvas chart__canvas--tall"><canvas id="chartE" role="img" aria-label="94 monthly points lie almost on a straight line, Calgary equals 3.96 plus 0.998 times Edmonton, R squared 0.991"></canvas></div>
+          </figure>
+        </section>
+
+        <section class="section" id="analysis" data-nav="Analysis">
+          <div class="head">
+            <p class="head__eyebrow">9 · Analysis (MGTS-103 methods)</p>
+            <h2>The gap is small, but it is real.</h2>
+          </div>
+          <div class="steps">
+            <article class="step">
+              <div class="step__intro"><p class="step__num">01</p><p class="step__eyebrow">Design</p></div>
+              <div>
+                <h3>Paired-sample design</h3>
+                <p>Each month gives one price in each city, so we analyse the 94 monthly differences d = Calgary − Edmonton.</p>
+                <p class="x-formula">d̄ = 3.73¢ · s_d = 2.34 · n = 94</p>
+                <p class="x-formula">SE = s_d / √n = 2.34 / √94 = 0.241</p>
+              </div>
+            </article>
+            <article class="step">
+              <div class="step__intro"><p class="step__num">02</p><p class="step__eyebrow">Estimate</p></div>
+              <div>
+                <h3>95% confidence interval</h3>
+                <p class="x-formula">d̄ ± t(0.025, 93) × SE<br />= 3.73 ± 1.986 × 0.241<br />= (3.25, 4.20) ¢/L</p>
+                <p>We are 95% confident the true average gap is between 3.25 and 4.20 cents per litre.</p>
+              </div>
+            </article>
+            <article class="step">
+              <div class="step__intro"><p class="step__num">03</p><p class="step__eyebrow">Test</p></div>
+              <div>
+                <h3>Paired t-test</h3>
+                <p class="x-formula">H0: μd = 0 · H1: μd &gt; 0</p>
+                <p class="x-formula">t = d̄ / SE = 3.73 / 0.241 = 15.47 · df = 93 · p &lt; 0.0001</p>
+                <p>Reject H0: Calgary is significantly more expensive than Edmonton.</p>
+              </div>
+              <dl class="step__panel"><dt>Decision</dt><dd><span class="chip chip--solid">Reject H0</span></dd></dl>
+            </article>
+            <article class="step">
+              <div class="step__intro"><p class="step__num">04</p><p class="step__eyebrow">Proportion</p></div>
+              <div>
+                <h3>How often Edmonton wins</h3>
+                <p class="x-formula">p̂ = 90 / 94 = 95.7% of months</p>
+              </div>
+            </article>
+            <article class="step">
+              <div class="step__intro"><p class="step__num">05</p><p class="step__eyebrow">Relationship</p></div>
+              <div>
+                <h3>Correlation and regression</h3>
+                <p class="x-formula">Calgary = 3.96 + 0.998 × Edmonton · r = 0.995 · R² = 0.991</p>
+                <p>A slope of about 1 means the gap does not grow when prices rise (Chart E).</p>
+              </div>
+            </article>
+            <article class="step">
+              <div class="step__intro"><p class="step__num">06</p><p class="step__eyebrow">Interpretation</p></div>
+              <div>
+                <h3>Small, but very consistent</h3>
+                <p>The city gap is small but very consistent. Seasonality is much larger (~20¢), but a business can't easily shift when it drives.</p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="recommend" data-nav="Recommend">
+          <div class="head">
+            <p class="head__eyebrow">10 · Recommendations</p>
+            <h2>Fill in Edmonton when it's on the route; budget by season.</h2>
+          </div>
+          <div class="cards">
+            <div>
+              <h3>Refuel in Edmonton</h3>
+              <p>Before Calgary runs, whenever practical. Saves ~3.7¢/L (CI 3.2–4.2¢).</p>
+            </div>
+            <div>
+              <h3>Budget seasonally</h3>
+              <p>Expect summer fuel costs ~15–20¢/L higher than December–January. Budget fuel by season, not as a flat monthly amount.</p>
+            </div>
+            <div>
+              <h3>Don't detour to save</h3>
+              <p>The gap is small, so fill in Edmonton only when it is already on the route.</p>
+            </div>
+          </div>
+          <div class="pair">
+            <div class="breakdown">
+              <dl>
+                <div class="row"><dt>Fleet <small>Vans</small></dt><dd>10</dd></div>
+                <div class="row"><dt>Distance <small>Per van, per year</small></dt><dd>25,000 km</dd></div>
+                <div class="row"><dt>Consumption</dt><dd>12 L/100 km</dd></div>
+                <div class="row"><dt>Fuel used <small>Per year</small></dt><dd>30,000 L</dd></div>
+                <div class="row"><dt>Gap</dt><dd>$0.0373/L</dd></div>
+                <div class="row row--total"><dt>Saved per year</dt><dd>~$1,119</dd></div>
+              </dl>
+              <p class="fineprint">Assumed fleet numbers; savings scale linearly with fuel volume.</p>
+            </div>
+            <aside class="callout" aria-label="Dollar impact">
+              <p class="callout__head">Dollar impact</p>
+              <p class="callout__lead"><strong>Small per fill, real at fleet scale.</strong> 30,000 L × $0.0373 ≈ $1,119 a year for ten vans.</p>
+              <p class="fineprint">Using the CI ends (3.25–4.20¢) gives roughly $975 to $1,260 a year.</p>
+            </aside>
+          </div>
+        </section>
+
+        <section class="section" id="limits" data-nav="Limitations">
+          <div class="head">
+            <p class="head__eyebrow">11 · Limitations</p>
+            <h2>What this data cannot tell a fleet manager.</h2>
+          </div>
+          <div class="cards">
+            <div><h3>Averages only</h3><p>Monthly city averages, not station-level or daily prices.</p></div>
+            <div><h3>Discounts</h3><p>Fleet card discounts and individual station pricing can beat the average gap.</p></div>
+            <div><h3>Policy changes</h3><p>The past gap may change with taxes or market events, e.g. the 2022 provincial fuel tax relief and the 2025 removal of the consumer carbon price, which affected both cities.</p></div>
+            <div><h3>Assumed fleet</h3><p>The dollar estimate uses assumed fleet numbers.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="ai" data-nav="AI use">
+          <div class="head">
+            <p class="head__eyebrow">12 · AI use and independent review</p>
+            <h2>One AI built it; a different AI checked it.</h2>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <caption>Workflow</caption>
+              <thead><tr><th scope="col">Step</th><th scope="col">What happened</th><th scope="col">Who</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">1</th><td>Drafted requirements</td><td>AI</td></tr>
+                <tr><th scope="row">2</th><td>Confirmed and edited requirements</td><td>Group</td></tr>
+                <tr><th scope="row">3</th><td>Built data prep, charts and analysis</td><td>AI</td></tr>
+                <tr class="is-highlight"><th scope="row">4</th><td>Reviewed for bugs and analytical errors</td><td>A different AI</td></tr>
+                <tr><th scope="row">5</th><td>Published on GitHub Pages</td><td>Group</td></tr>
+                <tr><th scope="row">6</th><td>Presented</td><td>Group</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="head">
+            <h2>Independent review</h2>
+            <p class="head__sub"><span class="chip">In progress</span></p>
+          </div>
+          <div class="prose">
+            <p>A different AI (ChatGPT) is reviewing the requirements, data, charts, calculations, interpretations and recommendations. Its findings and our corrections will be listed here.</p>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <caption>Corrections record</caption>
+              <thead><tr><th scope="col">Issue</th><th scope="col">Fix</th><th scope="col">Verified by</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">Pending review</th><td class="muted">—</td><td class="muted">—</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="cards">
+            <div>
+              <h3>Prompt disclosure</h3>
+              <p class="fineprint">Prompts used</p>
+              <ul>
+                <li>“Draft a requirements document for a project comparing Edmonton and Calgary gas prices for fleet decisions”</li>
+                <li>“Write Python to filter StatCan table 18-10-0001 for Edmonton and Calgary regular self-serve since 2019”</li>
+                <li>“Review this analysis for statistical errors and chart problems”</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+      </main>
+      <footer class="foot">
+        <p>MGTS-103-SB07, MacEwan University. Data: Statistics Canada, Table 18-10-0001-01. Built with AI assistance (Hark).</p>
+        <nav aria-label="Back to sections" data-auto></nav>
+        <a class="badge" href="https://hark.com/" target="_blank" rel="noopener"><span class="hark-mark"></span><span>built by hark</span></a>
+      </footer>
+    </div>
+    <script type="text/csv" id="prices">
+month,edmonton,calgary
+2019-01,91.8,95.2
+2019-02,99.2,102.0
+2019-03,110.2,113.6
+2019-04,118.9,122.5
+2019-05,117.8,120.7
+2019-06,100.4,103.6
+2019-07,105.4,108.4
+2019-08,99.9,102.2
+2019-09,99.3,102.1
+2019-10,98.2,100.4
+2019-11,95.1,97.9
+2019-12,96.2,99.0
+2020-01,98.8,101.6
+2020-02,96.4,99.0
+2020-03,77.0,79.2
+2020-04,62.4,66.2
+2020-05,83.3,87.2
+2020-06,92.0,95.1
+2020-07,95.0,97.4
+2020-08,92.2,97.5
+2020-09,98.8,104.9
+2020-10,92.0,104.5
+2020-11,90.2,103.7
+2020-12,94.7,101.9
+2021-01,100.9,102.8
+2021-02,109.0,111.3
+2021-03,114.5,117.3
+2021-04,119.9,123.6
+2021-05,123.4,127.3
+2021-06,125.6,130.3
+2021-07,133.0,135.6
+2021-08,132.3,135.2
+2021-09,129.5,133.1
+2021-10,138.3,140.8
+2021-11,136.0,141.9
+2021-12,130.6,139.5
+2022-01,133.7,138.9
+2022-02,142.2,145.4
+2022-03,161.7,164.7
+2022-04,150.5,155.5
+2022-05,163.3,167.4
+2022-06,186.0,189.5
+2022-07,179.1,183.1
+2022-08,147.3,153.0
+2022-09,136.8,144.2
+2022-10,163.4,167.1
+2022-11,148.1,149.3
+2022-12,126.2,124.2
+2023-01,127.4,128.6
+2023-02,123.0,125.5
+2023-03,129.0,132.2
+2023-04,140.4,145.1
+2023-05,138.1,146.0
+2023-06,139.4,144.6
+2023-07,136.7,141.3
+2023-08,142.5,146.8
+2023-09,141.8,143.1
+2023-10,138.7,137.6
+2023-11,132.9,130.1
+2023-12,122.2,120.0
+2024-01,120.5,125.6
+2024-02,129.9,134.5
+2024-03,141.8,147.0
+2024-04,154.6,159.6
+2024-05,151.1,156.0
+2024-06,149.5,153.6
+2024-07,154.6,158.8
+2024-08,152.5,155.4
+2024-09,137.7,142.9
+2024-10,141.3,146.5
+2024-11,138.2,142.4
+2024-12,135.8,140.8
+2025-01,144.3,149.2
+2025-02,147.2,150.0
+2025-03,145.3,147.9
+2025-04,126.7,130.2
+2025-05,129.1,131.2
+2025-06,127.3,131.2
+2025-07,126.3,130.1
+2025-08,129.2,132.9
+2025-09,130.5,132.2
+2025-10,123.7,124.8
+2025-11,122.6,126.6
+2025-12,112.4,114.9
+2026-01,118.9,121.6
+2026-02,118.5,122.1
+2026-03,151.2,155.0
+2026-04,161.6,164.3
+2026-05,172.9,176.9
+2026-06,154.6,161.8
+2026-07,162.5,168.2
+2026-08,160.3,162.3
+2026-09,162.5,167.3
+2026-10,155.5,157.9
+    </script>
+    <script type="application/json" id="yearly">
+      [{"year":"2019","gap":2.93},{"year":"2020","gap":5.45},{"year":"2021","gap":3.81},{"year":"2022","gap":3.67},{"year":"2023","gap":2.40},{"year":"2024","gap":4.63},{"year":"2025","gap":3.05},{"year":"2026 (Jan–Oct)","gap":3.89}]
+    </script>
+    <script type="application/json" id="seasonal">
+      [{"m":"Jan","e":117.0,"c":120.4},{"m":"Feb","e":120.7,"c":123.7},{"m":"Mar","e":128.8,"c":132.1},{"m":"Apr","e":129.4,"c":133.4},{"m":"May","e":134.9,"c":139.1},{"m":"Jun","e":134.3,"c":138.7},{"m":"Jul","e":136.6,"c":140.4},{"m":"Aug","e":132.0,"c":135.7},{"m":"Sep","e":129.6,"c":133.7},{"m":"Oct","e":131.4,"c":134.9},{"m":"Nov","e":123.3,"c":127.4},{"m":"Dec","e":116.9,"c":120.0}]
+    </script>
+    <script src="hark.js"></script>
+    <script src="chart.js"></script>
+    <script src="datalabels.js"></script>
+    <script src="hark-charts.js"></script>
+    <script>
+      (function () {
+        var rows = Hark.data("prices");
+        var MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        function monthName(i) { return MON[i % 12] + " " + (2019 + Math.floor(i / 12)); }
+        var cpl = function (v) { return v + "¢"; };
+        var axis = function (t) { return { display: true, text: t }; };
+        var CPL = "Price (cents per litre)";
+
+        // Chart A: monthly prices
+        new Chart(document.getElementById("chartA"), {
+          type: "line",
+          data: {
+            datasets: [
+              { label: "Edmonton", data: rows.map(function (r, i) { return { x: i, y: r.edmonton }; }), borderColor: "var(--chart-1)", backgroundColor: "var(--chart-1)" },
+              { label: "Calgary", data: rows.map(function (r, i) { return { x: i, y: r.calgary }; }), borderColor: "var(--chart-2)", backgroundColor: "var(--chart-2)" }
+            ]
+          },
+          options: {
+            interaction: { mode: "index", intersect: false },
+            scales: {
+              x: { type: "linear", min: 0, max: 93, title: axis("Month (Jan 2019 to Oct 2026)"), ticks: { stepSize: 12, callback: function (v) { return v % 12 === 0 ? String(2019 + v / 12) : ""; } } },
+              y: { title: axis(CPL), ticks: { callback: cpl } }
+            },
+            plugins: {
+              tooltip: { callbacks: { title: function (items) { return monthName(items[0].parsed.x); }, label: function (ctx) { return ctx.dataset.label + ": " + ctx.parsed.y.toFixed(1) + "¢/L"; } } }
+            }
+          }
+        });
+
+        // Chart B: yearly gap
+        var yearly = Hark.data("yearly");
+        new Chart(document.getElementById("chartB"), {
+          type: "bar",
+          data: { labels: yearly.map(function (d) { return d.year; }), datasets: [{ label: "Gap", data: yearly.map(function (d) { return d.gap; }) }] },
+          options: {
+            scales: { x: { title: axis("Year") }, y: { title: axis("Calgary minus Edmonton (cents per litre)"), ticks: { callback: cpl } } },
+            plugins: {
+              legend: { display: false },
+              datalabels: Object.assign({}, Hark.labels.values, { formatter: function (v) { return v.toFixed(2) + "¢"; } }),
+              tooltip: { callbacks: { label: function (ctx) { return "Gap: " + ctx.raw.toFixed(2) + "¢/L"; } } }
+            }
+          }
+        });
+
+        // Chart C: histogram of differences, 2-cent bins from -4 to 14
+        var counts = new Array(9).fill(0);
+        rows.forEach(function (r) {
+          var d = Math.round((r.calgary - r.edmonton) * 10) / 10;
+          var b = Math.floor((d + 4) / 2 + 1e-9);
+          if (b >= 0 && b < 9) counts[b]++;
+        });
+        var binLabels = counts.map(function (_, i) {
+          var lo = -4 + 2 * i, hi = lo + 2;
+          return (lo < 0 ? "−" + Math.abs(lo) : lo) + " to " + (hi < 0 ? "−" + Math.abs(hi) : hi);
+        });
+        new Chart(document.getElementById("chartC"), {
+          type: "bar",
+          data: {
+            labels: binLabels,
+            datasets: [{ label: "Months", data: counts, categoryPercentage: 1, barPercentage: 0.94, backgroundColor: counts.map(function (_, i) { return i < 2 ? "var(--chart-muted)" : "var(--chart-ink)"; }) }]
+          },
+          options: {
+            scales: { x: { title: axis("Calgary minus Edmonton (cents per litre); grey bars = Calgary cheaper") }, y: { title: axis("Number of months"), ticks: { stepSize: 10 } } },
+            plugins: {
+              legend: { display: false },
+              datalabels: Hark.labels.values,
+              tooltip: { callbacks: { title: function (items) { return items[0].label + "¢/L"; }, label: function (ctx) { return ctx.raw + " months"; } } }
+            }
+          }
+        });
+
+        // Chart D: seasonality
+        var s = Hark.data("seasonal");
+        new Chart(document.getElementById("chartD"), {
+          type: "line",
+          data: {
+            labels: s.map(function (d) { return d.m; }),
+            datasets: [
+              { label: "Edmonton", data: s.map(function (d) { return d.e; }), pointRadius: 3, borderColor: "var(--chart-1)", backgroundColor: "var(--chart-1)" },
+              { label: "Calgary", data: s.map(function (d) { return d.c; }), pointRadius: 3, borderColor: "var(--chart-2)", backgroundColor: "var(--chart-2)" }
+            ]
+          },
+          options: {
+            interaction: { mode: "index", intersect: false },
+            scales: { x: { title: axis("Calendar month (average of 2019–2026)") }, y: { title: axis(CPL), ticks: { callback: cpl } } },
+            plugins: { tooltip: { callbacks: { label: function (ctx) { return ctx.dataset.label + ": " + ctx.raw.toFixed(1) + "¢/L"; } } } }
+          }
+        });
+
+        // Chart E: scatter with regression line
+        var xs = rows.map(function (r) { return r.edmonton; });
+        var xmin = Math.min.apply(null, xs), xmax = Math.max.apply(null, xs);
+        var fit = function (x) { return Math.round((3.96 + 0.998 * x) * 10) / 10; };
+        new Chart(document.getElementById("chartE"), {
+          type: "scatter",
+          data: {
+            datasets: [
+              { label: "Months", data: rows.map(function (r, i) { return { x: r.edmonton, y: r.calgary, m: monthName(i) }; }), backgroundColor: "var(--chart-1)", borderColor: "var(--chart-1)" },
+              { type: "line", label: "Fit: Calgary = 3.96 + 0.998 × Edmonton", data: [{ x: xmin, y: fit(xmin) }, { x: xmax, y: fit(xmax) }], borderColor: "var(--chart-ink)", backgroundColor: "var(--chart-ink)", pointRadius: 0, borderWidth: 1.5 }
+            ]
+          },
+          options: {
+            scales: { x: { type: "linear", title: axis("Edmonton price (cents per litre)"), ticks: { callback: cpl } }, y: { title: axis("Calgary price (cents per litre)"), ticks: { callback: cpl } } },
+            plugins: {
+              tooltip: {
+                filter: function (item) { return item.datasetIndex === 0; },
+                callbacks: { title: function (items) { return items[0].raw.m; }, label: function (ctx) { return "Edm " + ctx.raw.x.toFixed(1) + "¢ · Cal " + ctx.raw.y.toFixed(1) + "¢"; } }
+              }
+            }
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
